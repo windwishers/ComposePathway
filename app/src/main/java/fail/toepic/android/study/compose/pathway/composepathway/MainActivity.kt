@@ -14,16 +14,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fail.toepic.android.study.compose.pathway.composepathway.ui.theme.ComposePathwayTheme
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ComposePathwayTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
-                    Greeting("Android")
-                }
+            MyApp{
+                Greeting("Android")
             }
+        }
+    }
+}
+
+@Composable
+/* @Composable ()->Unit 과 같이 함수 선언 앞에도 @Composable 이 붙는다는 점에 유의 하자. */
+fun MyApp(content : @Composable ()-> Unit){
+    ComposePathwayTheme {
+        // A surface container using the 'background' color from the theme
+        Surface(color = MaterialTheme.colors.background) {
+            content()
         }
     }
 }
@@ -46,7 +55,7 @@ fun Greeting(name: String) {
 @Preview(showBackground = true,name="Text Preview")
 @Composable
 fun DefaultPreview() {
-    ComposePathwayTheme {
+    MyApp{
         Greeting("Android")
     }
 }
