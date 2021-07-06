@@ -3,7 +3,9 @@ package fail.toepic.android.study.compose.pathway.composepathway
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -20,7 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MyApp{
-                Greeting("Android")
+                MyScreenContent()
             }
         }
     }
@@ -56,6 +58,18 @@ fun Greeting(name: String) {
 @Composable
 fun DefaultPreview() {
     MyApp{
+        MyScreenContent()
+    }
+}
+
+@Composable
+fun MyScreenContent(){
+    /* 컴포즈 함수를 호출하면 UI 계층구조에 요소가 추가 됩니다. 여러부분에서 동일한 함수를 호출 하여,
+     * 새 요소를 추가 할수 있습니다. */
+    Column {
         Greeting("Android")
+        /* Divider  는 수평 구분선을 그려줍니다.   */
+        Divider(color = Color.Black)
+        Greeting("there")
     }
 }
