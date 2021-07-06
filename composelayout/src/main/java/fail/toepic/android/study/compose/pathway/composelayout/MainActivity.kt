@@ -3,6 +3,7 @@ package fail.toepic.android.study.compose.pathway.composelayout
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -40,11 +41,16 @@ fun PhotographerCard(modifier: Modifier = Modifier) {
      * 자신만의 컴포저블을 생성하는 경우 수정자를 매개 변수로 사용하는 것을 고려하고 기본값을 Modifier-즉 아무것도
      * 하지 않은 빈 수정자)를 사용합니다.
      * Convention-규칙에 따라 Modifier-수정자는 함수의 첫번째 선택적 매개 변수로 지정됩니다.
-     * 이렇게 하면 모든 매개 변수의 이름을 지정하지 않고도 컴포저블에 수정자를 지정할 수 있습니다.
-     *
-     *
-     */
-    Row(modifier) {
+     * 이렇게 하면 모든 매개 변수의 이름을 지정하지 않고도 컴포저블에 수정자를 지정할 수 있습니다.*/
+    Row(modifier
+        /* 코드에서 팩토리 확장함수를 통하여 여러 수정자를 연속해서 지정하는 방법을 보여줍니다.
+         * 순서가 중요함으로 수정자를 연결할때 주의하여야 합니다. 단일 인자로 연결 됨으로 순서가 최종 결과에 영향을 줍니다.
+         * 만약 패딩보다 클릭이 먼저 온다면. 패팅이 클릭에 포함되고.
+         * 패딩이 클릭보다 먼저오면 패딩이 클릭에 포함되지 않게 됩니다. */
+//        .clickable { /* Ignoring onClick */ }
+        .padding(16.dp)
+        .clickable { /* Ignoring onClick */ }
+    ) {
         Surface(
             modifier = Modifier.size(50.dp),
             shape = CircleShape,
