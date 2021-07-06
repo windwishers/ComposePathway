@@ -40,8 +40,8 @@ fun MyApp(content : @Composable ()-> Unit){
 
 @Composable
 fun Greeting(name: String) {
-    /* Greeting 함수를 위해 다른 배경생을 지정하려면 내용을 포함하는 Surrface를 선언해야합니다.
-     * Surface 내부에 중첩 된 요소는 Surface의 배경색 위에 그려집니다.  */
+    /* Greeting 함수를 위해 다른 배경생을 지정하려면 내용을 포함하는 Surface 를 선언해야합니다.
+     * Surface 내부에 중첩 된 요소는 Surface 의 배경색 위에 그려집니다.  */
     Surface(color = Color.Yellow) {
         /* Modifier-수정자는 어떻게 배치 되고, 표시되며, 부모레이아웃 안에서 어떻게 동작 하는지에 대하여 말해줍니다.
         * 변수에 할당하고 재활용 될 수 있으며, 몇개의 수정자를 채이닝 하거나, 팩토리 확장함수 등을 이용하여 연속사용 할 수 있습니다? (맞나?_
@@ -63,6 +63,16 @@ fun DefaultPreview() {
 
 @Composable
 fun MyScreenContent(names: List<String> = listOf("Android", "there")){
+    /* 검포저블내부에 상태를 추가하려면 컴포저블 수정 가능한 메모리를 제공하는 mutableStateOf를 사용하세요
+     * 모든 디컴포징에서 다른 스테이트를 사용하게 되지 않으려면 mutable state 를 기억-remember 하는 remember 를 사용하세요
+     * 화면의 다른 위치에 컴포저블의 여러 인스턴스가 있는 경우. 각 인스턴스는 별도의 상태를 가지게 됩니다.
+     * 컴포저블 펑션은 자동으로 구독 됩니다. 그리고 상태가 변경 되면 자동으로 recompose 됩니다.
+     */
+    val countState = remember { mutableStateOf(0) }
+
+
+
+
     /* 컴포즈 함수를 호출하면 UI 계층구조에 요소가 추가 됩니다. 여러부분에서 동일한 함수를 호출 하여,
      * 새 요소를 추가 할수 있습니다. */
     Column {
@@ -73,20 +83,27 @@ fun MyScreenContent(names: List<String> = listOf("Android", "there")){
             Divider(color = Color.Black)
         }
         Divider(color = Color.Transparent, thickness = 32.dp)
-        Counter()
+        Counter(
+            count = countState.value,
+            updateCount = { newCount ->
+                countState.value = newCount
+            }
+        )
     }
 }
 
+/* 컴포저블 함수에서 상태는 소비되거나 제어 될 수 있는 요소이기 때문에 반드시 외부로 노출 되어야 합니다.
+ * 이러한 프로세스를  스테이트 호이스팅-state hoisting 이라고 합니다.
+ * -- hoisting 은 국기나 로프따위를 게양-'끌어올리다' 라는 의미를 가지고 있고. 권상- 권장하고 도와주는(상부상조에서의..) 일을 의미한다고 합니다.
+ * 따라서 이것은 하위 컴포저블의 스테이트?를 상위에서 제어할수있게 도와주거나. 상태 자체를 끌어올리는 방식을 의미한다고 해석 가능할 것 입니다. --
+ * 스테이트 호이스팅은 호출한 함수에 의해서 내부 상태를 제어 할 수 있게 하는 방법입니다.
+ * 매개변수를 통해 상태를 노출하고, 제어하는 함수에 의해서 외부에 노출 하면 됩니다. 상태 복재나 버그발생을 방지하고,
+ * 쉽게 테스트 할 수 있다고 합니다. 외부에 흥미롭지 않은 상태는 내부적이여야합니다.
+ * 예제에서의 소비자 Counter 는 상태에 관심 이 있을 수 있으므로 (count, updateCount)쌍을 매개 변수로 도입하여 호출자에게 완전히 연기 할 수 있습니다 Counter. 이런 식 Counter 으로 상태를 높이고 있습니다.
+ */
 @Composable
-fun Counter() {
-    /* 검포저블내부에 상태를 추가하려면 컴포저블 수정 가능한 메모리를 제공하는 mutableStateOf를 사용하세요
-    * 모든 디컴포징에서 다른 스테이트를 사용하게 되지 않으려면 mutable statte 를 기억-remember 하는 remember 를 사용하세요
-    * 화면의 다른 위치에 컴포저블의 여러 인스턴스가 있는 경우. 각 인스턴스는 별도의 상태를 가지게 됩니다.
-    * 컴포저블 펑션은 자동으로 구독 됩니다. 그리고 상태가 변경 되면 자동으로 recompose 됩니다.
-    */
-    val count = remember { mutableStateOf(0) }
-
-    Button(onClick = { count.value++ }) {
-        Text("I've been clicked ${count.value} times")
+fun Counter(count : Int, updateCount : (Int)->Unit) {
+    Button(onClick = { updateCount(count+1) }) {
+        Text("I've been clicked $count times")
     }
 }
