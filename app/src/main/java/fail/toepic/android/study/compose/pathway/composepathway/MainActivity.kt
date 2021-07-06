@@ -63,13 +63,15 @@ fun DefaultPreview() {
 }
 
 @Composable
-fun MyScreenContent(){
+fun MyScreenContent(names: List<String> = listOf("Android", "there")){
     /* 컴포즈 함수를 호출하면 UI 계층구조에 요소가 추가 됩니다. 여러부분에서 동일한 함수를 호출 하여,
      * 새 요소를 추가 할수 있습니다. */
     Column {
-        Greeting("Android")
-        /* Divider  는 수평 구분선을 그려줍니다.   */
-        Divider(color = Color.Black)
-        Greeting("there")
+        /* 컴포즈 함수는 다른 일반적인 코틀린 함수처럼 호출할 수있습니다.
+        * 예를 들어 for 문을 이용하여 요소를 추가 할 수 있습니다. */
+        for (name in names) {
+            Greeting(name = name)
+            Divider(color = Color.Black)
+        }
     }
 }
