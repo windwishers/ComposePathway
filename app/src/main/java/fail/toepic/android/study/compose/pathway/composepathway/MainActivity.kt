@@ -5,11 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -73,5 +72,21 @@ fun MyScreenContent(names: List<String> = listOf("Android", "there")){
             Greeting(name = name)
             Divider(color = Color.Black)
         }
+        Divider(color = Color.Transparent, thickness = 32.dp)
+        Counter()
+    }
+}
+
+@Composable
+fun Counter() {
+    /* 검포저블내부에 상태를 추가하려면 컴포저블 수정 가능한 메모리를 제공하는 mutableStateOf를 사용하세요
+    * 모든 디컴포징에서 다른 스테이트를 사용하게 되지 않으려면 mutable statte 를 기억-remember 하는 remember 를 사용하세요
+    * 화면의 다른 위치에 컴포저블의 여러 인스턴스가 있는 경우. 각 인스턴스는 별도의 상태를 가지게 됩니다.
+    * 컴포저블 펑션은 자동으로 구독 됩니다. 그리고 상태가 변경 되면 자동으로 recompose 됩니다.
+    */
+    val count = remember { mutableStateOf(0) }
+
+    Button(onClick = { count.value++ }) {
+        Text("I've been clicked ${count.value} times")
     }
 }
