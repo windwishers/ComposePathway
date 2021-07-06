@@ -3,17 +3,20 @@ package fail.toepic.android.study.compose.pathway.composelayout
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,7 +27,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ComposePathwayTheme {
-                PhotographerCard()
+                PhotographerCard2()
             }
         }
     }
@@ -80,6 +83,42 @@ fun PhotographerCard(modifier: Modifier = Modifier) {
 @Composable
 fun PhotographerCardPreview() {
     ComposePathwayTheme {
-        PhotographerCard()
+        PhotographerCard2()
+    }
+}
+
+/* 명시적인 순서는 다양한 수정자가 상호 작용하는 방식을 추론하는데 도움이 됩니다.
+ * view 시스템에서는 margin 이 '외부' 에 적용 되고, padding 이 '내부'에 적용 되었고 배경요소의 크기가 그에 따라 조정 되었습니다.
+ * 수정자의 구조는 이 동작을 명시적이고 에측가능하게 만들고 원하는 동작을 정확하게 달성 할수 있도록 많은 제어를 제공합니다.
+ *
+ * 수정자를 사용하면 매우 유연한 방식으로 컴포저블을 수정 할 수 있습니다.
+ * 예를 들어 외부 간격을 추가하고 컴포저블의 배경을 변경하고 모서리를 둥글게 하려면 아래와 같이 할 수있습니다.
+ */
+@Composable
+fun PhotographerCard2(modifier: Modifier = Modifier) {
+    Row(modifier
+        .padding(8.dp)
+        .clip(RoundedCornerShape(4.dp))
+        .background(MaterialTheme.colors.surface)
+        .clickable(onClick = { /* Ignoring onClick */ })
+        .padding(16.dp)
+    ) {
+        Surface(
+            modifier = Modifier.size(50.dp),
+            shape = CircleShape,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
+        ) {
+            // Image goes here
+        }
+        Column(
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .align(Alignment.CenterVertically)
+        )  {
+            Text("Alfred Sisley", fontWeight = FontWeight.Bold)
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Text("3 minutes ago", style = MaterialTheme.typography.body2)
+            }
+        }
     }
 }
