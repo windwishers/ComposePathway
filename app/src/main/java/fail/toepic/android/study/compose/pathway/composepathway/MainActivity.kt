@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +35,8 @@ class MainActivity : ComponentActivity() {
 fun MyApp(content : @Composable ()-> Unit){
     ComposePathwayTheme {
         // A surface container using the 'background' color from the theme
-        Surface(color = MaterialTheme.colors.background) {
+//        Surface(color = MaterialTheme.colors.background) {
+        Surface(color = Color.Yellow) {
             content()
         }
     }
@@ -63,26 +67,18 @@ fun DefaultPreview() {
 
 @Composable
 fun MyScreenContent(names: List<String> = listOf("Android", "there")){
-    /* 검포저블내부에 상태를 추가하려면 컴포저블 수정 가능한 메모리를 제공하는 mutableStateOf를 사용하세요
-     * 모든 디컴포징에서 다른 스테이트를 사용하게 되지 않으려면 mutable state 를 기억-remember 하는 remember 를 사용하세요
-     * 화면의 다른 위치에 컴포저블의 여러 인스턴스가 있는 경우. 각 인스턴스는 별도의 상태를 가지게 됩니다.
-     * 컴포저블 펑션은 자동으로 구독 됩니다. 그리고 상태가 변경 되면 자동으로 recompose 됩니다.
-     */
+
     val countState = remember { mutableStateOf(0) }
 
-
-
-
-    /* 컴포즈 함수를 호출하면 UI 계층구조에 요소가 추가 됩니다. 여러부분에서 동일한 함수를 호출 하여,
-     * 새 요소를 추가 할수 있습니다. */
-    Column {
-        /* 컴포즈 함수는 다른 일반적인 코틀린 함수처럼 호출할 수있습니다.
-        * 예를 들어 for 문을 이용하여 요소를 추가 할 수 있습니다. */
-        for (name in names) {
-            Greeting(name = name)
-            Divider(color = Color.Black)
+    /*  fillMaxHeight 수정자는 전체 높이를 차지하게 합니다. fillMaxSize() 나 fillMaxWidth() 도 사용이 가능합니다.  */
+    Column(modifier = Modifier.fillMaxHeight()) {
+        /* 특정 weight  로 화면을 차지 하도록 하기 위해 weight Modifier 를 사용 할 수 있습니다.
+        * 나머지에는 유연하지 않기 때문에-weight 가 없기때문에 Column 은 나머지 Column 이 영역을 차지한후
+        * 나머지 영역 전체를 점유 합니다.
+        *   */
+        Column(modifier = Modifier.weight(1f)) {
+            NameList()
         }
-        Divider(color = Color.Transparent, thickness = 32.dp)
         Counter(
             count = countState.value,
             updateCount = { newCount ->
@@ -92,18 +88,36 @@ fun MyScreenContent(names: List<String> = listOf("Android", "there")){
     }
 }
 
-/* 컴포저블 함수에서 상태는 소비되거나 제어 될 수 있는 요소이기 때문에 반드시 외부로 노출 되어야 합니다.
- * 이러한 프로세스를  스테이트 호이스팅-state hoisting 이라고 합니다.
- * -- hoisting 은 국기나 로프따위를 게양-'끌어올리다' 라는 의미를 가지고 있고. 권상- 권장하고 도와주는(상부상조에서의..) 일을 의미한다고 합니다.
- * 따라서 이것은 하위 컴포저블의 스테이트?를 상위에서 제어할수있게 도와주거나. 상태 자체를 끌어올리는 방식을 의미한다고 해석 가능할 것 입니다. --
- * 스테이트 호이스팅은 호출한 함수에 의해서 내부 상태를 제어 할 수 있게 하는 방법입니다.
- * 매개변수를 통해 상태를 노출하고, 제어하는 함수에 의해서 외부에 노출 하면 됩니다. 상태 복재나 버그발생을 방지하고,
- * 쉽게 테스트 할 수 있다고 합니다. 외부에 흥미롭지 않은 상태는 내부적이여야합니다.
- * 예제에서의 소비자 Counter 는 상태에 관심 이 있을 수 있으므로 (count, updateCount)쌍을 매개 변수로 도입하여 호출자에게 완전히 연기 할 수 있습니다 Counter. 이런 식 Counter 으로 상태를 높이고 있습니다.
- */
 @Composable
 fun Counter(count : Int, updateCount : (Int)->Unit) {
-    Button(onClick = { updateCount(count+1) }) {
+    Button(
+        onClick = { updateCount(count + 1) },
+        colors = ButtonDefaults.buttonColors(
+            /*
+            * Compose에서 Kotlin을 활용하는 또 다른 예로서
+            * Button사용자가 if...else문장을 사용하여 탭한 횟수에 따라의 배경색을 변경할 수 있습니다 .
+             */
+            backgroundColor = if(count>5) Color.Green else Color.White
+        )
+    ) {
         Text("I've been clicked $count times")
+    }
+}
+
+@Composable
+fun NameList(names: List<String> = List(1000) { "Hello Android #$it" }, modifier: Modifier = Modifier) {
+    // Column 은 기본적으로 스크롤 할 수 없습니다.
+//    Column(modifier = modifier) {
+    /*
+     * 참고 :LazyColumn 같은 아이를 재활용하지 않습니다 RecyclerView.
+     * 스크롤 할 때 새로운 Composables를 방출하고
+     * Composables를 방출하는 것은 Android 인스턴스화에 비해 상대적으로 저렴하기 때문에
+     * 여전히 성능이 Views 보다 좋습니다.
+     */
+    LazyColumn(modifier = modifier) {
+        items(items = names){ name ->
+            Greeting(name = name)
+            Divider(color = Color.Black)
+        }
     }
 }
