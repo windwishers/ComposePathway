@@ -29,6 +29,8 @@ fun Greeting(name: String) {
     Text(text = "Hello $name!")
 }
 
+/* 인자가 없는 컴포즈 함수는  @Preview 어노테이션으로 미리보기가 가능합니다.
+*  name 인자를 이용하여 프리뷰 이름을 지정할 수 있습니다. */
 @Preview(showBackground = true,name="Text Preview")
 @Composable
 fun DefaultPreview() {
